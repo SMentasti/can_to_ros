@@ -1,0 +1,142 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: InvMot InvGen Receiver BBS VCU Inverter
+
+
+BO_ 380 IMU03: 8 Vector__XXX
+ SG_ Az : 32|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g" Vector__XXX
+
+BO_ 376 IMU02: 8 Vector__XXX
+ SG_ Ax : 32|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g" Vector__XXX
+ SG_ RollRate : 0|16@1+ (0.005,-163.84) [-163.84|163.835] "deg/s" Vector__XXX
+
+BO_ 372 IMU01: 8 Vector__XXX
+ SG_ Ay : 32|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g" Vector__XXX
+ SG_ YawRate : 0|16@1+ (0.005,-163.84) [-163.84|163.835] "deg/s" Vector__XXX
+
+
+
+CM_ "C-CAN - Protocol - 29 bit";
+CM_ BU_ Inverter "Inverter";
+BA_DEF_ SG_  "Initial Value" FLOAT 0 200;
+BA_DEF_ SG_  "Signal Age [ms]" INT 0 300000;
+BA_DEF_ SG_  "Accuracy" STRING ;
+BA_DEF_ SG_  "Event trans." ENUM  "Yes","No";
+BA_DEF_ SG_  "GenSigTimeoutTime" INT 0 100000;
+BA_DEF_ SG_  "GenSigTimeoutMsg" HEX 0 2047;
+BA_DEF_ SG_  "GenSigInactiveValue" HEX 0 2147483647;
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType";
+BA_DEF_ BO_  "DiagRequest" ENUM  "No","Yes";
+BA_DEF_ BO_  "Period [ms]" INT 0 10000;
+BA_DEF_ BO_  "Type" ENUM  "P","E","PE","EM";
+BA_DEF_ BO_  "DiagResponse" ENUM  "No","Yes";
+BA_DEF_ BO_  "NmMessage" ENUM  "No","Yes";
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "cyclicX","spontanX","cyclicIfActiveX","spontanWithDelay","cyclicAndSpontanX","cyclicAndSpontanWithDelay","spontanWithRepitition","cyclicIfActiveAndSpontanWD";
+BA_DEF_ BO_  "GenMsgTimeoutTime" INT 0 10000;
+BA_DEF_ BO_  "GenMsgNrOfRepetition" INT 0 100;
+BA_DEF_ BO_  "GenMsgILSupport" ENUM  "No","Yes";
+BA_DEF_ BO_  "GenMsgStartDelayTime" INT 0 100000;
+BA_DEF_ BO_  "GenMsgCycleTimeFast" INT 0 10000;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 10000;
+BA_DEF_ BO_  "GenMsgDelayTime" INT 0 10000;
+BA_DEF_ BO_  "TpOwnSystemEcuNumber" HEX 0 255;
+BA_DEF_ BU_  "TpTxIdentifier" HEX 0 1968;
+BA_DEF_ BU_  "TpRxIdentifier" HEX 0 1984;
+BA_DEF_ BU_  "TpRxMask" HEX 0 2047;
+BA_DEF_ BU_  "TpNodeAddress" HEX 0 2047;
+BA_DEF_ BU_  "TpCanBus" STRING ;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BU_  "Node Address" INT 0 31;
+BA_DEF_ BU_  "Description" STRING ;
+BA_DEF_ BU_  "Node Diag Address" STRING ;
+BA_DEF_ BU_  "TpNodeBaseAddress" HEX 0 2047;
+BA_DEF_ BU_  "NmType" ENUM  "FIAT","None","Fiat_Class_C";
+BA_DEF_ BU_  "NmStationAddress" HEX 0 31;
+BA_DEF_ BU_  "NmNode" ENUM  "No","Yes";
+BA_DEF_ BU_  "ILUsed" ENUM  "No","Yes";
+BA_DEF_ BU_  "NmNodeType" ENUM  "Master Fiat NM Class B","Fiat NM Class C","Slave Fiat NM Class B","none";
+BA_DEF_ BU_  "NwmNodeType" ENUM  "kMaster","kSlave15","kSlave30","none";
+BA_DEF_  "ILTxTimeout" INT 0 10000;
+BA_DEF_  "Manufacturer" STRING ;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_DEF_  "Initial Value" 0;
+BA_DEF_DEF_  "Signal Age [ms]" 0;
+BA_DEF_DEF_  "Accuracy" "";
+BA_DEF_DEF_  "Event trans." "No";
+BA_DEF_DEF_  "GenSigTimeoutTime" 0;
+BA_DEF_DEF_  "GenSigTimeoutMsg" 0;
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenSigSendType" "NoSigSendType";
+BA_DEF_DEF_  "DiagRequest" "No";
+BA_DEF_DEF_  "Period [ms]" 0;
+BA_DEF_DEF_  "Type" "";
+BA_DEF_DEF_  "DiagResponse" "No";
+BA_DEF_DEF_  "NmMessage" "Yes";
+BA_DEF_DEF_  "GenMsgSendType" "";
+BA_DEF_DEF_  "GenMsgTimeoutTime" 0;
+BA_DEF_DEF_  "GenMsgNrOfRepetition" 0;
+BA_DEF_DEF_  "GenMsgILSupport" "No";
+BA_DEF_DEF_  "GenMsgStartDelayTime" 0;
+BA_DEF_DEF_  "GenMsgCycleTimeFast" 0;
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgDelayTime" 0;
+BA_DEF_DEF_  "TpOwnSystemEcuNumber" 241;
+BA_DEF_DEF_  "TpTxIdentifier" 1536;
+BA_DEF_DEF_  "TpRxIdentifier" 1536;
+BA_DEF_DEF_  "TpRxMask" 1536;
+BA_DEF_DEF_  "TpNodeAddress" 1536;
+BA_DEF_DEF_  "TpCanBus" "1";
+BA_DEF_DEF_  "NodeLayerModules" "Osek_TP.dll;FiatNM_B.dll";
+BA_DEF_DEF_  "Node Address" 0;
+BA_DEF_DEF_  "Description" "";
+BA_DEF_DEF_  "Node Diag Address" "";
+BA_DEF_DEF_  "TpNodeBaseAddress" 1536;
+BA_DEF_DEF_  "NmType" "FIAT";
+BA_DEF_DEF_  "NmStationAddress" 0;
+BA_DEF_DEF_  "NmNode" "No";
+BA_DEF_DEF_  "ILUsed" "Yes";
+BA_DEF_DEF_  "NmNodeType" "none";
+BA_DEF_DEF_  "NwmNodeType" "none";
+BA_DEF_DEF_  "ILTxTimeout" 50;
+BA_DEF_DEF_  "Manufacturer" "Tarsi";
+BA_DEF_DEF_  "BusType" "";
+BA_ "NwmNodeType" BU_ Inverter 3;
+BA_ "NmNode" BU_ Inverter 1;
+BA_ "NmStationAddress" BU_ Inverter 1;
+BA_ "Node Diag Address" BU_ Inverter "16";
+BA_ "Description" BU_ Inverter "Logica Inverter";
+BA_ "Node Address" BU_ Inverter 1;
+
