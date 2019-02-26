@@ -36,6 +36,11 @@ from can import __version__
 import cantools
 import rospy
 from sensor_msgs.msg import Imu
+from sensor_msgs.msg import PointCloud2
+import sensor_msgs.point_cloud2 as pcl2
+import numpy as np
+
+
 
 
 
@@ -84,14 +89,37 @@ class CanViewer:
         db = cantools.database.load_file(curret+'/can/db/BoschIMU.dbc')
         db_leddar = cantools.database.load_file(curret+'/can/db/LeddarDB.dbc') 
         pub_imu = rospy.Publisher('imu_bosh', Imu ,queue_size=1)
+        leddar_pub = rospy.Publisher("/leddartech", PointCloud2)
         rospy.init_node('imu_bosh')
         msg_start = can.Message(arbitration_id=0x740, data=[5, 1, 0, 0, 0, 0, 0, 0], is_extended_id=True)
         self.bus.send(msg_start)
 	imu_counter =0
+	leddar_counter =0
         messaggio_imu = Imu()
         ax=0
         ay=0
         az=0
+        distance00 =0
+        distance01 =0
+        distance02 =0
+        distance03 =0
+        distance04 =0
+        distance05 =0
+        distance06 =0
+        distance07 =0
+        distance08 =0
+        distance09 =0
+        distance010 =0
+        distance011 =0
+        distance012 =0
+        distance013 =0
+        distance014 =0
+        distance015 =0
+        heigh = 0.35
+        step = 1.74533/16 #radianti
+        start_angle = (3,14159-1.74533)/2
+        
+        
         roll_rate=0 
         yaw_rate =0
 
@@ -134,10 +162,73 @@ class CanViewer:
                             print ("ax: %1.5f, ay: %1.5f, az: %1.5f\r" % (ax,ay,az) )
                             #print ("\r")
                             
-                        if (msg.arbitration_id > 0x751 and msg.arbitration_id < 0x762  ):
+                        if (msg.arbitration_id > 0x751 and msg.arbitration_id < 0x760  ):
                             decoded_message = (db_leddar.decode_message((msg.arbitration_id ), msg.data))
-                            print (decoded_message)
-                            print ("\r")
+                            if (msg.arbitration_id ==752):
+                                distance00 = decoded_message['Distance00']
+                                distance01 = decoded_message['Distance01']
+                                leddar_counter+=1
+                            if (msg.arbitration_id ==753):
+                                distance02 = decoded_message['Distance02']
+                                distance03 = decoded_message['Distance03']
+                                leddar_counter+=1
+                            if (msg.arbitration_id ==754):
+                                distance04 = decoded_message['Distance04']
+                                distance05 = decoded_message['Distance05']
+                                leddar_counter+=1
+                            if (msg.arbitration_id ==755):
+                                distance06 = decoded_message['Distance06']
+                                distance07 = decoded_message['Distance07']
+                                leddar_counter+=1
+                            if (msg.arbitration_id ==756):
+                                distance08 = decoded_message['Distance08']
+                                distance09 = decoded_message['Distance09']
+                                leddar_counter+=1
+                            if (msg.arbitration_id ==757):
+                                distance10 = decoded_message['Distance10']
+                                distance11 = decoded_message['Distance11']
+                                leddar_counter+=1
+                            if (msg.arbitration_id ==758):
+                                distance12 = decoded_message['Distance12']
+                                distance13 = decoded_message['Distance13']
+                                leddar_counter+=1
+                            if (msg.arbitration_id ==759):
+                                distance14 = decoded_message['Distance14']
+                                distance15 = decoded_message['Distance15']
+                                leddar_counter+=1
+                                
+                            if leddar_counter>=8:
+                                leddar_counter=0
+                                cloud_points = [[distance00*np.sin (step*0+start_angle) , distance00*np.cos (step*0+start_angle), heigh], \
+                                [distance01*np.sin (step*1+start_angle) , distance01*np.cos (step*1+start_angle), heigh], \
+                                [distance02*np.sin (step*2+start_angle) , distance02*np.cos (step*2+start_angle), heigh], \
+                                [distance03*np.sin (step*3+start_angle) , distance03*np.cos (step*3+start_angle), heigh], \
+                                [distance04*np.sin (step*4+start_angle) , distance04*np.cos (step*4+start_angle), heigh], \
+                                [distance05*np.sin (step*5+start_angle) , distance05*np.cos (step*5+start_angle), heigh], \
+                                [distance06*np.sin (step*6+start_angle) , distance06*np.cos (step*6+start_angle), heigh], \
+                                [distance07*np.sin (step*7+start_angle) , distance07*np.cos (step*7+start_angle), heigh], \
+                                [distance08*np.sin (step*8+start_angle) , distance08*np.cos (step*8+start_angle), heigh], \
+                                [distance09*np.sin (step*9+start_angle) , distance09*np.cos (step*9+start_angle), heigh], \
+                                [distance10*np.sin (step*10+start_angle) , distance10*np.cos (step*10+start_angle), heigh], \
+                                [distance11*np.sin (step*11+start_angle) , distance11*np.cos (step*11+start_angle), heigh], \
+                                [distance12*np.sin (step*12+start_angle) , distance12*np.cos (step*12+start_angle), heigh], \
+                                [distance13*np.sin (step*13+start_angle) , distance13*np.cos (step*13+start_angle), heigh], \
+                                [distance14*np.sin (step*14+start_angle) , distance14*np.cos (step*14+start_angle), heigh], \
+                                [distance15*np.sin (step*15+start_angle) , distance15*np.cos (step*15+start_angle), heigh]]
+                                header = std_msgs.msg.Header()
+                                header.stamp = rospy.Time.now()
+                                header.frame_id = 'leddartech'
+                                scaled_polygon_pcl = pcl2.create_cloud_xyz32(header, cloud_points)
+                                leddar_pub.publish(scaled_polygon_pcl)
+                                print ("distance: %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f \r" % (distance00, distance01,distance02,distance03, \
+                                distance04, distance05,distance06,distance07, distance08,distance09,distance10, distance11,distance12,distance13, distance14,distance15) )
+                                
+                                
+                                
+                                
+                                
+                            #print (decoded_message)
+                            #print ("\r")
                     except:
                         print ("err")
                     
