@@ -82,41 +82,65 @@ class CanViewer:
         curret = os.getcwd()
  
         db = cantools.database.load_file(curret+'/can/db/BoschIMU.dbc')
+        db_leddar = cantools.database.load_file(curret+'/can/db/LeddarDB.dbc') 
         pub_imu = rospy.Publisher('imu_bosh', Imu ,queue_size=1)
         rospy.init_node('imu_bosh')
-     
+        msg_start = can.Message(arbitration_id=0x740, data=[5, 1, 0, 0, 0, 0, 0, 0], is_extended_id=True)
+        self.bus.send(msg_start)
+	imu_counter =0
+        messaggio_imu = Imu()
+        ax=0
+        ay=0
+        az=0
+        roll_rate=0 
+        yaw_rate =0
 
         while 1:
             # Do not read the CAN-Bus when in paused mode	
             if not self.paused:
                 # Read the CAN-Bus and draw it in the terminal window
                 msg = self.bus.recv(timeout=1. / 1000.)
+                #self.bus.send(msg_start)
                 if msg is not None:
                     try:
-                        decoded_message = (db.decode_message((msg.arbitration_id ), msg.data))
+                        print (msg.arbitration_id)
+                        print ("\r")
+                        if (msg.arbitration_id == 0x376 or msg.arbitration_id == 0x372 or msg.arbitration_id == 0x380 ):
+                            decoded_message = (db.decode_message((msg.arbitration_id ), msg.data))
                         
                         #print (msg.arbitration_id)
                         #print (decoded_message)
-                        if (msg.arbitration_id ==376): #ax
-                            ax = decoded_message['Ax']
-                            roll_rate = decoded_message['RollRate']
-                        if (msg.arbitration_id ==372): #ay
-                            ay = decoded_message['Ay']
-                            yaw_rate = decoded_message['YawRate']
-                        if (msg.arbitration_id ==380): #az
-                            az = decoded_message['Az']
-                        messaggio_imu = Imu()
-                        messaggio_imu.linear_acceleration.x = ax
-                        messaggio_imu.linear_acceleration.y = ay
-                        messaggio_imu.linear_acceleration.z = az
-                        messaggio_imu.angular_velocity.x = roll_rate
-                        messaggio_imu.angular_velocity.y = yaw_rate
-                        pub_imu.publish(messaggio_imu)
-                        #print ("ax: ", ax, " ay: ",ay, " az:",az, "\r")
-                        print ("ax: %1.5f, ay: %1.5f, az: %1.5f\r" % (ax,ay,az) )
-                        #print ("\r")
+                            if (msg.arbitration_id ==376): #ax
+                                ax = decoded_message['Ax']
+                                roll_rate = decoded_message['RollRate']
+                                imu_counter+=1
+                            if (msg.arbitration_id ==372): #ay
+                                ay = decoded_message['Ay']
+                                yaw_rate = decoded_message['YawRate']
+                                imu_counter+=1
+                            if (msg.arbitration_id ==380): #az
+                                az = decoded_message['Az']
+                                imu_counter+=1
+                            
+                            messaggio_imu.linear_acceleration.x = ax
+                            messaggio_imu.linear_acceleration.y = ay
+                            messaggio_imu.linear_acceleration.z = az
+                            messaggio_imu.angular_velocity.x = roll_rate
+                            messaggio_imu.angular_velocity.y = yaw_rate
+                            if (imu_counter>=3):
+                                pub_imu.publish(messaggio_imu)
+                                imu_counter=0
+                            #print ("ax: ", ax, " ay: ",ay, " az:",az, "\r")
+                            print ("ax: %1.5f, ay: %1.5f, az: %1.5f\r" % (ax,ay,az) )
+                            #print ("\r")
+                            
+                        if (msg.arbitration_id > 0x751 and msg.arbitration_id < 0x762  ):
+                            decoded_message = (db_leddar.decode_message((msg.arbitration_id ), msg.data))
+                            print (decoded_message)
+                            print ("\r")
                     except:
                         print ("err")
+                    
                     #self.draw_can_bus_message(msg)
             else:
                 # Sleep 1 ms, so the application does not use 100 % of the CPU resources

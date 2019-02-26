@@ -1,0 +1,137 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_:
+
+
+BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
+ SG_ Flag00 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag15 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag14 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag13 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag12 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag11 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag10 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag09 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag08 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag07 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag06 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag05 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag04 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag03 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flag02 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Segment01 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Flag01 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1881 Obj_07: 8 Vector__XXX
+ SG_ Segment15 : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Segment14 : 28|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Distance15 : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Distance14 : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude15 : 48|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+ SG_ Amplitude14 : 16|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+
+BO_ 1880 Obj_06: 8 Vector__XXX
+ SG_ Segment13 : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Segment12 : 28|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Distance13 : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Distance12 : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude13 : 48|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+ SG_ Amplitude12 : 16|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+
+BO_ 1879 Obj_05: 8 Vector__XXX
+ SG_ Segment11 : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Distance11 : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude11 : 48|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+ SG_ Segment10 : 28|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Distance10 : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude10 : 16|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+
+BO_ 1878 Obj_04: 8 Vector__XXX
+ SG_ Segment09 : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Segment08 : 28|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Distance09 : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Distance08 : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude09 : 48|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+ SG_ Amplitude08 : 16|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+
+BO_ 1877 Obj_03: 8 Vector__XXX
+ SG_ Segment07 : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Segment06 : 28|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Distance07 : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Distance06 : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude07 : 48|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+ SG_ Amplitude06 : 16|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+
+BO_ 1876 Obj_02: 8 Vector__XXX
+ SG_ Segment05 : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Segment04 : 28|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Distance05 : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Distance04 : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude05 : 48|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+ SG_ Amplitude04 : 16|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+
+BO_ 1875 Obj_01: 8 Vector__XXX
+ SG_ Segment03 : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Segment02 : 28|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Distance03 : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Distance02 : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude03 : 48|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+ SG_ Amplitude02 : 16|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+
+BO_ 1873 Stato: 8 Vector__XXX
+ SG_ TimeStamp : 32|32@1+ (1,0) [0|4294967295] "ms" Vector__XXX
+ SG_ NumberOfObjects : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ LaserPower : 16|8@1+ (0.3921568627451,0) [0|100.000000000001] "" Vector__XXX
+
+BO_ 0 Impostazioni: 8 Vector__XXX
+ SG_ ReqFunction : 8|8@1- (1,0) [0|0] "" Vector__XXX
+ SG_ ReqFunciotnDetail : 0|8@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 1874 Obj_00: 8 Vector__XXX
+ SG_ Segment01 : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ Distance01 : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude01 : 48|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+ SG_ Distance00 : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ Amplitude00 : 16|12@1+ (0.25,0) [0|1023.75] "" Vector__XXX
+ SG_ Segment00 : 28|4@1+ (1,0) [0|15] "" Vector__XXX
+
+
+
+CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_DEF_  "BusType" "";
+BA_ "BusType" "CAN";
+
