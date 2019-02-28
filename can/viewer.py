@@ -97,7 +97,7 @@ class CanViewer:
             self.bus.send(msg_start)
         except can.CanError:
             print("Message NOT sent")
-	imu_counter =0
+	imu_counter =[0,0,0]
 	leddar_counter =[0,0,0,0,0,0,0,0]
         messaggio_imu = Imu()
         ax=0
@@ -135,9 +135,9 @@ class CanViewer:
                 #self.bus.send(msg_start)
                 if msg is not None:
                     try:
-                        #print (msg.arbitration_id)
+                        print (msg.arbitration_id)
                         print ("\r")
-                        if (msg.arbitration_id == 0x376 or msg.arbitration_id == 0x372 or msg.arbitration_id == 0x380 ):
+                        if (msg.arbitration_id == 376 or msg.arbitration_id == 372 or msg.arbitration_id == 380 ):
                             decoded_message = (db.decode_message((msg.arbitration_id ), msg.data))
                         
                         #print (msg.arbitration_id)
@@ -145,23 +145,24 @@ class CanViewer:
                             if (msg.arbitration_id ==376): #ax
                                 ax = decoded_message['Ax']
                                 roll_rate = decoded_message['RollRate']
-                                imu_counter+=1
+                                imu_counter[0]=1
                             if (msg.arbitration_id ==372): #ay
                                 ay = decoded_message['Ay']
                                 yaw_rate = decoded_message['YawRate']
-                                imu_counter+=1
+                                imu_counter[1]=1
                             if (msg.arbitration_id ==380): #az
                                 az = decoded_message['Az']
-                                imu_counter+=1
+                                imu_counter[2]=1
                             
                             messaggio_imu.linear_acceleration.x = ax
                             messaggio_imu.linear_acceleration.y = ay
                             messaggio_imu.linear_acceleration.z = az
                             messaggio_imu.angular_velocity.x = roll_rate
                             messaggio_imu.angular_velocity.y = yaw_rate
-                            if (imu_counter>=3):
+                            if (sum(imu_counter)==3):
+                                imu_counter =[0,0,0]
                                 pub_imu.publish(messaggio_imu)
-                                imu_counter=0
+                                
                             #print ("ax: ", ax, " ay: ",ay, " az:",az, "\r")
                             print ("ax: %1.5f, ay: %1.5f, az: %1.5f\r" % (ax,ay,az) )
                             #print ("\r")
