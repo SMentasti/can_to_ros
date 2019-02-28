@@ -37,6 +37,7 @@ import cantools
 import rospy
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import PointCloud2
+import std_msgs.msg
 import sensor_msgs.point_cloud2 as pcl2
 import numpy as np
 
@@ -89,12 +90,15 @@ class CanViewer:
         db = cantools.database.load_file(curret+'/can/db/BoschIMU.dbc')
         db_leddar = cantools.database.load_file(curret+'/can/db/LeddarDB.dbc') 
         pub_imu = rospy.Publisher('imu_bosh', Imu ,queue_size=1)
-        leddar_pub = rospy.Publisher("/leddartech", PointCloud2)
+        leddar_pub = rospy.Publisher("/leddartech", PointCloud2,queue_size=1)
         rospy.init_node('imu_bosh')
-        msg_start = can.Message(arbitration_id=0x740, data=[5, 1, 0, 0, 0, 0, 0, 0], is_extended_id=True)
-        self.bus.send(msg_start)
+        try:
+            msg_start = can.Message(arbitration_id=1856, data=[5, 1, 0, 0, 0, 0, 0, 0], extended_id=False)
+            self.bus.send(msg_start)
+        except can.CanError:
+            print("Message NOT sent")
 	imu_counter =0
-	leddar_counter =0
+	leddar_counter =[0,0,0,0,0,0,0,0]
         messaggio_imu = Imu()
         ax=0
         ay=0
@@ -117,7 +121,7 @@ class CanViewer:
         distance015 =0
         heigh = 0.35
         step = 1.74533/16 #radianti
-        start_angle = (3,14159-1.74533)/2
+        start_angle = (3.14159-1.74533)/2
         
         
         roll_rate=0 
@@ -131,7 +135,7 @@ class CanViewer:
                 #self.bus.send(msg_start)
                 if msg is not None:
                     try:
-                        print (msg.arbitration_id)
+                        #print (msg.arbitration_id)
                         print ("\r")
                         if (msg.arbitration_id == 0x376 or msg.arbitration_id == 0x372 or msg.arbitration_id == 0x380 ):
                             decoded_message = (db.decode_message((msg.arbitration_id ), msg.data))
@@ -164,41 +168,49 @@ class CanViewer:
                             
                         if (msg.arbitration_id > 0x751 and msg.arbitration_id < 0x760  ):
                             decoded_message = (db_leddar.decode_message((msg.arbitration_id ), msg.data))
-                            if (msg.arbitration_id ==752):
-                                distance00 = decoded_message['Distance00']
-                                distance01 = decoded_message['Distance01']
-                                leddar_counter+=1
-                            if (msg.arbitration_id ==753):
-                                distance02 = decoded_message['Distance02']
-                                distance03 = decoded_message['Distance03']
-                                leddar_counter+=1
-                            if (msg.arbitration_id ==754):
-                                distance04 = decoded_message['Distance04']
-                                distance05 = decoded_message['Distance05']
-                                leddar_counter+=1
-                            if (msg.arbitration_id ==755):
-                                distance06 = decoded_message['Distance06']
-                                distance07 = decoded_message['Distance07']
-                                leddar_counter+=1
-                            if (msg.arbitration_id ==756):
-                                distance08 = decoded_message['Distance08']
-                                distance09 = decoded_message['Distance09']
-                                leddar_counter+=1
-                            if (msg.arbitration_id ==757):
-                                distance10 = decoded_message['Distance10']
-                                distance11 = decoded_message['Distance11']
-                                leddar_counter+=1
-                            if (msg.arbitration_id ==758):
-                                distance12 = decoded_message['Distance12']
-                                distance13 = decoded_message['Distance13']
-                                leddar_counter+=1
-                            if (msg.arbitration_id ==759):
-                                distance14 = decoded_message['Distance14']
-                                distance15 = decoded_message['Distance15']
-                                leddar_counter+=1
+                            if (msg.arbitration_id ==0x752):
+                                distance00 = float (decoded_message['Distance00'])/100
+                                distance01 = float (decoded_message['Distance01'])/100
+                                leddar_counter[0]=1
+                                #print ("1")
+                            if (msg.arbitration_id ==0x753):
+                                distance02 = float(decoded_message['Distance02'])/100
+                                distance03 = float(decoded_message['Distance03'])/100
+                                leddar_counter[1]=1
+                                #print ("2")
+                            if (msg.arbitration_id ==0x754):
+                                distance04 = float(decoded_message['Distance04'])/100
+                                distance05 = float(decoded_message['Distance05'])/100
+                                leddar_counter[2]=1
+                                #print ("3")
+                            if (msg.arbitration_id ==0x755):
+                                distance06 = float(decoded_message['Distance06'])/100
+                                distance07 = float(decoded_message['Distance07'])/100
+                                leddar_counter[3]=1
+                                #print ("4")
+                            if (msg.arbitration_id ==0x756):
+                                distance08 = float(decoded_message['Distance08'])/100
+                                distance09 = float(decoded_message['Distance09'])/100
+                                leddar_counter[4]=1
+                                #print ("5")
+                            if (msg.arbitration_id ==0x757):
+                                distance10 = float(decoded_message['Distance10'])/100
+                                distance11 = float(decoded_message['Distance11'])/100
+                                leddar_counter[5]=1
+                                #print ("6")
+                            if (msg.arbitration_id ==0x758):
+                                distance12 = float(decoded_message['Distance12'])/100
+                                distance13 = float(decoded_message['Distance13'])/100
+                                leddar_counter[6]=1
+                                #print ("7")
+                            if (msg.arbitration_id ==0x759):
+                                distance14 = float(decoded_message['Distance14'])/100
+                                distance15 = float(decoded_message['Distance15'])/100
+                                leddar_counter[7]=1
+                                #print ("8")
                                 
-                            if leddar_counter>=8:
-                                leddar_counter=0
+                            if sum(leddar_counter)>=8:
+                                leddar_counter =[0,0,0,0,0,0,0,0]
                                 cloud_points = [[distance00*np.sin (step*0+start_angle) , distance00*np.cos (step*0+start_angle), heigh], \
                                 [distance01*np.sin (step*1+start_angle) , distance01*np.cos (step*1+start_angle), heigh], \
                                 [distance02*np.sin (step*2+start_angle) , distance02*np.cos (step*2+start_angle), heigh], \
@@ -229,8 +241,9 @@ class CanViewer:
                                 
                             #print (decoded_message)
                             #print ("\r")
-                    except:
-                        print ("err")
+                    except Exception as e: 
+                        print(e)
+
                     
                     #self.draw_can_bus_message(msg)
             else:
