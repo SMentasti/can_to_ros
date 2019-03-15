@@ -38,8 +38,10 @@ import rospy
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import PointCloud2
 import std_msgs.msg
+import geometry_msgs.msg
 import sensor_msgs.point_cloud2 as pcl2
 import numpy as np
+from geometry_msgs.msg import Vector3
 
 
 
@@ -89,8 +91,10 @@ class CanViewer:
  
         db = cantools.database.load_file(curret+'/can/db/BoschIMU.dbc')
         db_leddar = cantools.database.load_file(curret+'/can/db/LeddarDB.dbc') 
+        db_torcia = cantools.database.load_file(curret+'/can/db/Torcia.dbc')
         pub_imu = rospy.Publisher('imu_bosh', Imu ,queue_size=1)
         leddar_pub = rospy.Publisher("/leddartech", PointCloud2,queue_size=1)
+        pub_torcia = rospy.Publisher('torcia', Vector3 ,queue_size=1)
         rospy.init_node('imu_bosh')
         try:
             msg_start = can.Message(arbitration_id=1856, data=[5, 1, 0, 0, 0, 0, 0, 0], extended_id=False)
@@ -100,6 +104,7 @@ class CanViewer:
 	imu_counter =[0,0,0]
 	leddar_counter =[0,0,0,0,0,0,0,0]
         messaggio_imu = Imu()
+        messaggio_torcia = Vector3()
         ax=0
         ay=0
         az=0
@@ -237,8 +242,18 @@ class CanViewer:
                                 distance04, distance05,distance06,distance07, distance08,distance09,distance10, distance11,distance12,distance13, distance14,distance15) )
                                 
                                 
-                                
-                                
+                        if (msg.arbitration_id == 0x65a   ): 
+                            decoded_message = (db_torcia.decode_message((msg.arbitration_id ), msg.data)) 
+                            print (decoded_message)
+                              
+                            Vt = float(decoded_message['Vt'])
+                            Vl = float(decoded_message['Vl'])
+                            psi = float(decoded_message['psi'])
+                            messaggio_torcia.x = Vt
+                            messaggio_torcia.y = Vl
+                            messaggio_torcia.z = psi
+                            pub_torcia.publish (messaggio_torcia)
+                                                         
                                 
                             #print (decoded_message)
                             #print ("\r")
