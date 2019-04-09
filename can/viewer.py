@@ -42,6 +42,8 @@ import geometry_msgs.msg
 import sensor_msgs.point_cloud2 as pcl2
 import numpy as np
 from geometry_msgs.msg import Vector3
+from custom_messages.msg import radar_point
+from custom_messages.msg import radar_msg
 
 
 
@@ -92,22 +94,31 @@ class CanViewer:
         db = cantools.database.load_file(curret+'/can/db/BoschIMU.dbc')
         db_leddar = cantools.database.load_file(curret+'/can/db/LeddarDB.dbc') 
         db_torcia = cantools.database.load_file(curret+'/can/db/Torcia.dbc')
+        db_radar = cantools.database.load_file(curret+'/can/db/RadarDB.dbc')
         pub_imu = rospy.Publisher('imu_bosh', Imu ,queue_size=1)
         leddar_pub = rospy.Publisher("/leddartech", PointCloud2,queue_size=1)
         pub_torcia = rospy.Publisher('torcia', Vector3 ,queue_size=1)
-        rospy.init_node('imu_bosh')
+        pub_radar = rospy.Publisher ('/radar',radar_msg,queue_size = 1)
+        rospy.init_node('can_node')
         try:
             msg_start = can.Message(arbitration_id=1856, data=[5, 1, 0, 0, 0, 0, 0, 0], extended_id=False)
             self.bus.send(msg_start)
         except can.CanError:
             print("Message NOT sent")
+	
+	
+	
+	#imu stuff
 	imu_counter =[0,0,0]
-	leddar_counter =[0,0,0,0,0,0,0,0]
         messaggio_imu = Imu()
         messaggio_torcia = Vector3()
+        messaggio_radar = radar_msg()
         ax=0
         ay=0
         az=0
+        
+        #leddartech stuff
+        leddar_counter =[0,0,0,0,0,0,0,0]
         distance00 =0
         distance01 =0
         distance02 =0
@@ -128,6 +139,14 @@ class CanViewer:
         step = 1.74533/16 #radianti
         start_angle = (3.14159-1.74533)/2
         
+        #radar stuff
+        radar_start_received=0
+        radar_objects = 0
+        radar_objects_counter = 0
+        radar_grid_resolution = 0.15000000596
+        radar_grid_width = 500
+        radar_grid_heigh = 533  
+        
         
         roll_rate=0 
         yaw_rate =0
@@ -140,9 +159,9 @@ class CanViewer:
                 #self.bus.send(msg_start)
                 if msg is not None:
                     try:
-                        print (msg.arbitration_id)
-                        print ("\r")
-                        if (msg.arbitration_id == 376 or msg.arbitration_id == 372 or msg.arbitration_id == 380 ):
+                        #print (msg.arbitration_id)
+                        #print ("\r")
+                        if (msg.arbitration_id == 376 or msg.arbitration_id == 372 or msg.arbitration_id == 380 ):  #imu
                             decoded_message = (db.decode_message((msg.arbitration_id ), msg.data))
                         
                         #print (msg.arbitration_id)
@@ -172,7 +191,7 @@ class CanViewer:
                             print ("ax: %1.5f, ay: %1.5f, az: %1.5f\r" % (ax,ay,az) )
                             #print ("\r")
                             
-                        if (msg.arbitration_id > 0x751 and msg.arbitration_id < 0x760  ):
+                        if (msg.arbitration_id > 0x751 and msg.arbitration_id < 0x760  ): #leddartech
                             decoded_message = (db_leddar.decode_message((msg.arbitration_id ), msg.data))
                             if (msg.arbitration_id ==0x752):
                                 distance00 = float (decoded_message['Distance00'])/100
@@ -238,13 +257,13 @@ class CanViewer:
                                 header.frame_id = 'leddartech'
                                 scaled_polygon_pcl = pcl2.create_cloud_xyz32(header, cloud_points)
                                 leddar_pub.publish(scaled_polygon_pcl)
-                                print ("distance: %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f \r" % (distance00, distance01,distance02,distance03, \
-                                distance04, distance05,distance06,distance07, distance08,distance09,distance10, distance11,distance12,distance13, distance14,distance15) )
+                                #print ("distance: %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f %5.1f \r" % (distance00, distance01,distance02,distance03, \
+ #                               distance04, distance05,distance06,distance07, distance08,distance09,distance10, distance11,distance12,distance13, distance14,distance15) )
                                 
                                 
-                        if (msg.arbitration_id == 0x65a   ): 
+                        if (msg.arbitration_id == 0x65a   ): #datron
                             decoded_message = (db_torcia.decode_message((msg.arbitration_id ), msg.data)) 
-                            print (decoded_message)
+                            #print (decoded_message)
                               
                             Vt = float(decoded_message['Vt'])
                             Vl = float(decoded_message['Vl'])
@@ -253,12 +272,170 @@ class CanViewer:
                             messaggio_torcia.y = Vl
                             messaggio_torcia.z = psi
                             pub_torcia.publish (messaggio_torcia)
-                                                         
+                        
+                        if (msg.arbitration_id >= 0x60a and msg.arbitration_id <= 0x60e   ): #radar
+                            #print ("Radar\r")
+                            if (msg.arbitration_id == 0x60a): #messaggio di inizio
+                                #print ("inizio\r")
+                                
+                                decoded_message = (db_radar.decode_message((msg.arbitration_id ), msg.data)) 
+                                
+                                radar_objects =  int (decoded_message['Object_NofObjects'])
+                                received_radar_point = radar_point()
+                                for i in range (255):
+                                    messaggio_radar.cloud.append (received_radar_point)
+                                #print ("numero di oggetti:"+str(radar_objects)+"\n\r")
+                                index_1 = 0
+                                index_2 = 0
+                                index_3 = 0
+                                
+                                radar_start_received = 1
+                                
+                            if (radar_start_received==1):    #significa che so quanti oggetti aspettarmi
+                                #index = 0  
+                                   
+                                if (msg.arbitration_id == 0x60b): #messaggio contenente info per un oggetto
+                                    
+                                    #print ("oggetto\r")
+                                    decoded_message = (db_radar.decode_message((msg.arbitration_id ), msg.data)) 
+                                    #adesso mi calcolo il punto e lo aggiungo al messaggio
+                                    
+                                    #print (decoded_message)
+                                    x = float (decoded_message['Object_DistLong'])
+                                    y = float (decoded_message['Object_DistLat'])
+                                    
+                                    #index = int (decoded_message['Object_ID'])
+                                    #print (index)
+                                    #print ("\r-----------------------------------\r")
+                                    
+                                    
+                                    received_radar_point = radar_point()
+                                    
+                                    received_radar_point.Object_VrelLong = float (decoded_message['Object_VrelLong'])
+                                    received_radar_point.Object_VrelLat = float (decoded_message['Object_VrelLat'])
+                                    received_radar_point.Object_RCS = float (decoded_message['Object_RCS'])
+                                    received_radar_point.Object_ID = int (decoded_message['Object_ID'])
+                                    received_radar_point.Object_DynProp = float (decoded_message['Object_DynProp'])
+                                    received_radar_point.Object_DistLong = float (decoded_message['Object_DistLong'])
+                                    received_radar_point.Object_DistLat = float (decoded_message['Object_DistLat'])
+                                    messaggio_radar.cloud[index_1] = received_radar_point
+                                    index_1 += 1
+                                   
+                                    
+                                
+                                if (msg.arbitration_id == 0x60c):
+                                    
+                                    
+                                    decoded_message = (db_radar.decode_message((msg.arbitration_id ), msg.data)) 
+                                    #index = int (decoded_message['Obj_ID'])
+                                    #print (index)
+                                    #print ("\r-----------------------------------\r")
+                                    #print (decoded_message)
+                                    
+                                    received_radar_point = radar_point()
+                                    prev_radar_point = messaggio_radar.cloud[index_2] 
+                                    
+                                    received_radar_point.Object_VrelLong = prev_radar_point.Object_VrelLong
+                                    received_radar_point.Object_VrelLat = prev_radar_point.Object_VrelLat
+                                    received_radar_point.Object_RCS = prev_radar_point.Object_RCS
+                                    received_radar_point.Object_ID = prev_radar_point.Object_ID
+                                    received_radar_point.Object_DynProp = prev_radar_point.Object_DynProp
+                                    received_radar_point.Object_DistLong = prev_radar_point.Object_DistLong
+                                    received_radar_point.Object_DistLat = prev_radar_point.Object_DistLat
+                                    
+                                    
+                                    
+                                    
+                                    received_radar_point.Obj_VrelLong_rms = float (decoded_message['Obj_VrelLong_rms'])
+                                    received_radar_point.Obj_VrelLat_rms = float (decoded_message['Obj_VrelLat_rms'])
+                                    received_radar_point.Obj_ProbOfExist = float (decoded_message['Obj_ProbOfExist'])
+                                    received_radar_point.Obj_Orientation_rms = float (decoded_message['Obj_Orientation_rms'])
+                                    received_radar_point.Obj_MeasState = float (decoded_message['Obj_MeasState'])
+                                    received_radar_point.Obj_ID2 = int (decoded_message['Obj_ID'])
+                                    received_radar_point.Obj_DistLong_rms = float (decoded_message['Obj_DistLong_rms'])
+                                    received_radar_point.Obj_DistLat_rms = float (decoded_message['Obj_DistLat_rms'])
+                                    received_radar_point.Obj_ArelLong_rms = float (decoded_message['Obj_ArelLong_rms'])
+                                    received_radar_point.Obj_ArelLat_rms = float (decoded_message['Obj_ArelLat_rms'])
+                                    messaggio_radar.cloud[index_2] = received_radar_point
+                                    index_2 += 1
+                                    
+                                    
+                                    
+                                    
+                                
+                                if (msg.arbitration_id == 0x60d):  
+                                    
+                                    decoded_message = (db_radar.decode_message((msg.arbitration_id ), msg.data))   
+                                    radar_objects_counter += 1    #un oggetto in piu 
+                                    #index = (int (decoded_message['Object_ID']))
+                                    #print (index)
+                                    #print ("\r")
+                                    #index = 1
+                                    prev_radar_point = messaggio_radar.cloud[index_3] 
+                                    received_radar_point = radar_point()
+                                    
+                                    received_radar_point.Object_VrelLong = prev_radar_point.Object_VrelLong
+                                    received_radar_point.Object_VrelLat = prev_radar_point.Object_VrelLat
+                                    received_radar_point.Object_RCS = prev_radar_point.Object_RCS
+                                    received_radar_point.Object_ID = prev_radar_point.Object_ID
+                                    received_radar_point.Object_DynProp = prev_radar_point.Object_DynProp
+                                    received_radar_point.Object_DistLong = prev_radar_point.Object_DistLong
+                                    received_radar_point.Object_DistLat = prev_radar_point.Object_DistLat
+                                    
+                                    received_radar_point.Obj_VrelLong_rms = prev_radar_point.Obj_VrelLong_rms
+                                    received_radar_point.Obj_VrelLat_rms = prev_radar_point.Obj_VrelLat_rms
+                                    received_radar_point.Obj_ProbOfExist =  prev_radar_point.Obj_ProbOfExist
+                                    received_radar_point.Obj_Orientation_rms = prev_radar_point.Obj_Orientation_rms
+                                    received_radar_point.Obj_MeasState = prev_radar_point.Obj_MeasState
+                                    received_radar_point.Obj_ID2 = prev_radar_point.Obj_ID2
+                                    received_radar_point.Obj_DistLong_rms = prev_radar_point.Obj_DistLong_rms
+                                    received_radar_point.Obj_DistLat_rms = prev_radar_point.Obj_DistLat_rms
+                                    received_radar_point.Obj_ArelLong_rms = prev_radar_point.Obj_ArelLong_rms
+                                    received_radar_point.Obj_ArelLat_rms = prev_radar_point.Obj_ArelLat_rms
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    received_radar_point.Object_ID3 = int (decoded_message['Object_ID'])
+                                    received_radar_point.Object_Width = float (decoded_message['Object_Width'])
+                                    received_radar_point.Object_OrientationAngel = float (decoded_message['Object_OrientationAngel'])
+                                    received_radar_point.Object_Length = float (decoded_message['Object_Length'])
+                                    received_radar_point.Object_Class = float (decoded_message['Object_Class'])
+                                    received_radar_point.Object_ArelLong = float (decoded_message['Object_ArelLong'])
+                                    received_radar_point.Object_ArelLat = float (decoded_message['Object_ArelLat'])
+                                    messaggio_radar.cloud[index_3] = received_radar_point
+                                    index_3 += 1
+                                    
+                                    '''
+                                    messaggio_radar.cloud[index].Object_ID3 = int (decoded_message['Object_ID'])
+                                    messaggio_radar.cloud[index].Object_Width = float (decoded_message['Object_Width'])
+                                    messaggio_radar.cloud[index].Object_OrientationAngel = float (decoded_message['Object_OrientationAngel'])
+                                    messaggio_radar.cloud[index].Object_Length = float (decoded_message['Object_Length'])
+                                    messaggio_radar.cloud[index].Object_Class = float (decoded_message['Object_Class'])
+                                    messaggio_radar.cloud[index].Object_ArelLong = float (decoded_message['Object_ArelLong'])
+                                    messaggio_radar.cloud[index].Object_ArelLat = float (decoded_message['Object_ArelLat'])
+                                    '''
+                                    
+                                    
+                                    
+                                          
+                                    if (radar_objects_counter == radar_objects ):
+                                        radar_objects_counter=0
+                                        radar_start_received =0
+                                        
+                                       
+                                        print ("publish\r")
+                                        pub_radar.publish (messaggio_radar)
+                                        messaggio_radar.cloud = []
+                                            
+                                    #'''                            
                                 
                             #print (decoded_message)
                             #print ("\r")
                     except Exception as e: 
                         print(e)
+                        print ("\r")
 
                     
                     #self.draw_can_bus_message(msg)
